@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -53,8 +54,14 @@ public class PreviewActivity extends AppCompatActivity {
                 Frame frame = new Frame.Builder().setBitmap(imgBitmap).build();
                 SparseArray<Face> faces = safeDetector.detect(frame);
 
-                if (faces.size() == 0) {
-                    Toast.makeText(getApplicationContext(), "No faces detected", Toast.LENGTH_LONG).show();
+                int rotations = 0;
+                while (faces.size() == 0) {
+                    if (rotations == 3)
+                        break;
+                    imgBitmap = rotateBitmap(imgBitmap);
+                    frame = new Frame.Builder().setBitmap(imgBitmap).build();
+                    faces = safeDetector.detect(frame);
+                    rotations++;
                 }
 
                 if (!safeDetector.isOperational()) {
@@ -82,6 +89,14 @@ public class PreviewActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         detector.release();
+    }
+
+    Bitmap rotateBitmap(Bitmap bitmapToRotate) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(90);
+        return Bitmap.createBitmap(bitmapToRotate, 0, 0,
+                bitmapToRotate.getWidth(), bitmapToRotate.getHeight(), matrix,
+                true);
     }
 
 }
