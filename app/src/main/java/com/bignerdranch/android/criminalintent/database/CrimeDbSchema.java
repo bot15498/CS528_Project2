@@ -12,4 +12,12 @@ public class CrimeDbSchema {
             public static final String SUSPECT = "suspect";
         }
     }
+
+    public static final class CrimeImageTable {
+        public static final String NAME = "images";
+        public static final class Cols {
+            public static final String CRIMEID = "crimeID";
+            public static final String FILEPATH = "filePath";
+        }
+    }
 }

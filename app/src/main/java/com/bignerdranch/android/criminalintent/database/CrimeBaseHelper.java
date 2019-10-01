@@ -27,6 +27,13 @@ public class CrimeBaseHelper extends SQLiteOpenHelper {
                 CrimeTable.Cols.SOLVED +
                 ")"
         );
+
+        db.execSQL("create table " + CrimeDbSchema.CrimeImageTable.NAME + "(" +
+                " _id integer primary key autoincrement, " +
+                CrimeDbSchema.CrimeImageTable.Cols.CRIMEID + "," +
+                CrimeDbSchema.CrimeImageTable.Cols.FILEPATH +
+                ")"
+        );
     }
 
     @Override
