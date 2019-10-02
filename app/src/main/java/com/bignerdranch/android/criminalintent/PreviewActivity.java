@@ -26,62 +26,84 @@ public class PreviewActivity extends AppCompatActivity {
     private ImageView imgDisplay;
     private FaceDetector detector;
     private Bitmap editedBitmap;
+    private boolean yesFaceDetect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preview);
-
 //        imgDisplay = (ImageView) findViewById(R.id.imgDisplay);
-
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            String photoFilePath = extras.getString("photoFilePath");
-            if (photoFilePath != null) {
-                Log.d(getClass().getName(), photoFilePath);
-                File imgFile = new File(photoFilePath);
-                Bitmap imgBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+            boolean isFaceDetect = extras.getBoolean("yesFD");
+            faceDetect(isFaceDetect, extras);
+        }
+    }
+
+    protected void faceDetect(boolean yesFaceDet, Bundle extras) {
+        String photoFilePath = extras.getString("photoFilePath");
+        if (photoFilePath != null) {
+            Log.d(getClass().getName(), photoFilePath);
+            File imgFile = new File(photoFilePath);
+            Bitmap imgBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
 //                imgDisplay.setImageBitmap(imgBitmap);
 
-                detector = new FaceDetector.Builder(getApplicationContext())
-                        .setTrackingEnabled(false)
-                        .setLandmarkType(FaceDetector.ALL_LANDMARKS)
-                        .build();
+            detector = new FaceDetector.Builder(getApplicationContext())
+                    .setTrackingEnabled(false)
+                    .setLandmarkType(FaceDetector.ALL_LANDMARKS)
+                    .build();
 
-                Detector<Face> safeDetector = new SafeFaceDetector(detector);
+            Detector<Face> safeDetector = new SafeFaceDetector(detector);
 
-                // Create a frame from the bitmap and run face detection on the frame.
-                Frame frame = new Frame.Builder().setBitmap(imgBitmap).build();
-                SparseArray<Face> faces = safeDetector.detect(frame);
+            // Create a frame from the bitmap and run face detection on the frame.
+            Frame frame = new Frame.Builder().setBitmap(imgBitmap).build();
+            SparseArray<Face> faces = safeDetector.detect(frame);
 
-                int rotations = 0;
-                while (faces.size() == 0) {
-                    if (rotations == 3)
-                        break;
-                    imgBitmap = rotateBitmap(imgBitmap);
-                    frame = new Frame.Builder().setBitmap(imgBitmap).build();
-                    faces = safeDetector.detect(frame);
-                    rotations++;
+            int rotations = 0;
+            int numFaces;
+            int max = 0;
+            int maxRotations = 0;
+            while (rotations < 3) {
+                Bitmap tmpImgBitmap = rotateBitmap(imgBitmap);
+                frame = new Frame.Builder().setBitmap(tmpImgBitmap).build();
+                faces = safeDetector.detect(frame);
+                numFaces = faces.size();
+                if (max <= numFaces) {
+                    max = numFaces;
+                    maxRotations = rotations;
                 }
-
-                if (!safeDetector.isOperational()) {
-                    Log.w(getClass().getName(), "Face detector dependencies are not yet available.");
-
-                    // Check for low storage.  If there is low storage, the native library will not be
-                    // downloaded, so detection will not become operational.
-                    IntentFilter lowstorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
-                    boolean hasLowStorage = registerReceiver(null, lowstorageFilter) != null;
-
-                    if (hasLowStorage) {
-                        Toast.makeText(this, "Low storage", Toast.LENGTH_LONG).show();
-                    }
-                }
-
-                FaceView overlay = (FaceView) findViewById(R.id.faceView);
-                overlay.setContent(imgBitmap, faces);
-
-                safeDetector.release();
+                rotations++;
             }
+
+            for (int i=0; i<=maxRotations; i++)
+            {
+                imgBitmap = rotateBitmap(imgBitmap);
+                frame = new Frame.Builder().setBitmap(imgBitmap).build();
+                faces = safeDetector.detect(frame);
+            }
+
+            if (!safeDetector.isOperational()) {
+                Log.w(getClass().getName(), "Face detector dependencies are not yet available.");
+
+                // Check for low storage.  If there is low storage, the native library will not be
+                // downloaded, so detection will not become operational.
+                IntentFilter lowstorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
+                boolean hasLowStorage = registerReceiver(null, lowstorageFilter) != null;
+
+                if (hasLowStorage) {
+                    Toast.makeText(this, "Low storage", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            FaceView overlay = (FaceView) findViewById(R.id.faceView);
+
+            if (yesFaceDet) {
+                overlay.setContent(imgBitmap, faces);
+                Toast.makeText(getApplicationContext(), "Detected " + faces.size() +  " total", Toast.LENGTH_LONG).show();
+            } else {
+                overlay.setContent(imgBitmap, new SparseArray<Face>());
+            }
+            safeDetector.release();
         }
     }
 

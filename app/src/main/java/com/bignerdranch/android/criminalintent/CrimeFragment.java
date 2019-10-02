@@ -49,6 +49,8 @@ public class CrimeFragment extends Fragment {
     private Button mSuspectButton;
     private ImageButton mPhotoButton;
     private ImageView mPhotoView;
+    private CheckBox mFaceDetectCheckbox;
+    private boolean yesDetect;
 
     private String photoFilePath;
 
@@ -123,6 +125,15 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        mFaceDetectCheckbox = (CheckBox) v.findViewById(R.id.checkBox);
+        mFaceDetectCheckbox.setChecked(false);
+        mFaceDetectCheckbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                yesDetect = isChecked;
+            }
+        });
+
         mReportButton = (Button)v.findViewById(R.id.crime_report);
         mReportButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -184,6 +195,7 @@ public class CrimeFragment extends Fragment {
                 if (photoFilePath != null) {
                     Intent intent = new Intent(getActivity(), PreviewActivity.class);
                     intent.putExtra("photoFilePath", photoFilePath);
+                    intent.putExtra("yesFD", yesDetect);
                     startActivity(intent);
                 }
             }
