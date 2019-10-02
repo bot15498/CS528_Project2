@@ -11,6 +11,21 @@ public class Crime {
     private boolean mSolved;
     private String mSuspect;
 
+    /////////
+    private String mPhoto;
+
+    public String getmPhoto() {
+        return mPhoto;
+    }
+
+    public void setmPhoto(String mPhoto) {
+        this.mPhoto = mPhoto;
+    }
+    //////////
+
+
+
+
     public Crime() {
         this(UUID.randomUUID());
     }
