@@ -16,6 +16,7 @@ import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
@@ -49,6 +51,7 @@ public class CrimeFragment extends Fragment {
 	private Button mSuspectButton;
 	private ImageButton mPhotoButton;
 	private ImageView mPhotoView;
+	private Button mGalaryButton;
 
 	public static CrimeFragment newInstance(UUID crimeId) {
 		Bundle args = new Bundle();
@@ -132,6 +135,15 @@ public class CrimeFragment extends Fragment {
 				i = Intent.createChooser(i, getString(R.string.send_report));
 
 				startActivity(i);
+			}
+		});
+
+		mGalaryButton = (Button)v.findViewById(R.id.crime_galary_button);
+		mGalaryButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Intent intent = new Intent(getActivity(), CrimeImagesActivity.class);
+				intent.putExtra("CRIME_UUID", mCrime.getId());
+				startActivity(intent);
 			}
 		});
 

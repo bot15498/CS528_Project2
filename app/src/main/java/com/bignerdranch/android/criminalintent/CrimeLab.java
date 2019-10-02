@@ -15,6 +15,7 @@ import com.bignerdranch.android.criminalintent.database.CrimeDbSchema.CrimeTable
 import com.bignerdranch.android.criminalintent.database.ImageCursorWrapper;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -78,8 +79,8 @@ public class CrimeLab {
 		}
 	}
 
-	public List<File> getPhotoFiles(Crime crime) {
-		List<File> photoFiles = new ArrayList<>();
+	public ArrayList<File> getPhotoFiles(Crime crime) {
+		ArrayList<File> photoFiles = new ArrayList<>();
 		ImageCursorWrapper cursor = queryCrimeImages(
 				CrimeDbSchema.CrimeImageTable.Cols.CRIMEID + " = ?",
 				new String[]{crime.getId().toString()});
