@@ -62,7 +62,7 @@ public class CrimeImageAdapter extends ArrayAdapter<File> {
 			holder = (ViewHolder) view.getTag();
 		}
 		File file = mImageFiles.get(i);
-		Bitmap bitmap = PictureUtils.getScaledBitmap(file.getPath(), holder.image.getWidth(), holder.image.getHeight());
+		Bitmap bitmap = PictureUtils.getScaledBitmap(file.getPath(), holder.image.getMaxWidth(), holder.image.getMaxHeight());
         holder.image.setImageBitmap(bitmap);
 
 		return view;
