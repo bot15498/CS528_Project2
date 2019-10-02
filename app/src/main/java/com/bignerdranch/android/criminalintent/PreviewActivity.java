@@ -59,28 +59,28 @@ public class PreviewActivity extends AppCompatActivity {
             Frame frame = new Frame.Builder().setBitmap(imgBitmap).build();
             SparseArray<Face> faces = safeDetector.detect(frame);
 
-                int rotations = 0;
-                int numFaces;
-                int max = 0;
-                int maxRotations = 0;
-                while (rotations < 3) {
-                    Bitmap tmpImgBitmap = rotateBitmap(imgBitmap);
-                    frame = new Frame.Builder().setBitmap(tmpImgBitmap).build();
-                    faces = safeDetector.detect(frame);
-                    numFaces = faces.size();
-                    if (max <= numFaces) {
-                        max = numFaces;
-                        maxRotations = rotations;
-                    }
-                    rotations++;
+            int rotations = 0;
+            int numFaces;
+            int max = 0;
+            int maxRotations = 0;
+            while (rotations < 3) {
+                Bitmap tmpImgBitmap = rotateBitmap(imgBitmap);
+                frame = new Frame.Builder().setBitmap(tmpImgBitmap).build();
+                faces = safeDetector.detect(frame);
+                numFaces = faces.size();
+                if (max <= numFaces) {
+                    max = numFaces;
+                    maxRotations = rotations;
                 }
+                rotations++;
+            }
 
-                for (int i=0; i<=maxRotations; i++)
-                {
-                    imgBitmap = rotateBitmap(imgBitmap);
-                    frame = new Frame.Builder().setBitmap(imgBitmap).build();
-                    faces = safeDetector.detect(frame);
-                }
+            for (int i=0; i<=maxRotations; i++)
+            {
+                imgBitmap = rotateBitmap(imgBitmap);
+                frame = new Frame.Builder().setBitmap(imgBitmap).build();
+                faces = safeDetector.detect(frame);
+            }
 
             if (!safeDetector.isOperational()) {
                 Log.w(getClass().getName(), "Face detector dependencies are not yet available.");
@@ -95,17 +95,11 @@ public class PreviewActivity extends AppCompatActivity {
                 }
             }
 
-                Toast.makeText(getApplicationContext(), "Detected " + faces.size() +  " total", Toast.LENGTH_LONG).show();
-//                for (int i=0; i<faces.size(); i++)
-//                {
-//
-//                }
-
-                FaceView overlay = (FaceView) findViewById(R.id.faceView);
             FaceView overlay = (FaceView) findViewById(R.id.faceView);
 
             if (yesFaceDet) {
                 overlay.setContent(imgBitmap, faces);
+                Toast.makeText(getApplicationContext(), "Detected " + faces.size() +  " total", Toast.LENGTH_LONG).show();
             } else {
                 overlay.setContent(imgBitmap, new SparseArray<Face>());
             }
