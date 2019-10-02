@@ -36,8 +36,15 @@ public class FaceView extends View {
     private Bitmap mBitmap;
     private SparseArray<Face> mFaces;
 
+    private Paint mBoxPaint;
+
     public FaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        mBoxPaint = new Paint();
+        mBoxPaint.setColor(Color.CYAN);
+        mBoxPaint.setStyle(Paint.Style.STROKE);
+        mBoxPaint.setStrokeWidth(5.0f);
     }
 
     /**
@@ -93,6 +100,19 @@ public class FaceView extends View {
 
         for (int i = 0; i < mFaces.size(); ++i) {
             Face face = mFaces.valueAt(i);
+
+            float x = (face.getPosition().x + face.getWidth() / 2) * (float) scale;
+            float y = (face.getPosition().y + face.getHeight() / 2) * (float) scale;
+
+            // Draws a bounding box around the face.
+            float xOffset = (face.getWidth() / 2.0f) * (float) scale;
+            float yOffset = (face.getHeight() / 2.0f) * (float) scale;
+            float left = x - xOffset;
+            float top = y - yOffset;
+            float right = x + xOffset;
+            float bottom = y + yOffset;
+            canvas.drawRect(left, top, right, bottom, mBoxPaint);
+
             for (Landmark landmark : face.getLandmarks()) {
                 int cx = (int) (landmark.getPosition().x * scale);
                 int cy = (int) (landmark.getPosition().y * scale);
