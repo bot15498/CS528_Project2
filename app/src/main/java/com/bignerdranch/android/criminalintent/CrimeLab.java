@@ -15,7 +15,6 @@ import com.bignerdranch.android.criminalintent.database.CrimeDbSchema.CrimeTable
 import com.bignerdranch.android.criminalintent.database.ImageCursorWrapper;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

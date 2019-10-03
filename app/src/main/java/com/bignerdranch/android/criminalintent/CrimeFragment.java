@@ -1,14 +1,12 @@
 package com.bignerdranch.android.criminalintent;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -17,7 +15,6 @@ import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
@@ -31,9 +28,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 
 import com.bignerdranch.android.criminalintent.face.patch.SafeFaceDetector;
 import com.bignerdranch.android.criminalintent.face.photo.FaceView;
@@ -68,10 +63,7 @@ public class CrimeFragment extends Fragment {
     private Button mGalaryButton;
     private CheckBox mFaceDetectCheckbox;
     private boolean yesDetect;
-    private FaceView imgFace;
-    private View v1;
 	private FaceDetector detector;
-
     private String photoFilePath;
 
 	public static CrimeFragment newInstance(UUID crimeId) {
@@ -104,8 +96,6 @@ public class CrimeFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_crime, container, false);
-		v1 = v;
-
 
 		mTitleField = (EditText) v.findViewById(R.id.crime_title);
 		mTitleField.setText(mCrime.getTitle());
@@ -318,19 +308,9 @@ public class CrimeFragment extends Fragment {
 	}
 
     private void updatePhotoView() {
-//        if (mPhotoFile == null || !mPhotoFile.exists()) {
-//            mPhotoView.setImageDrawable(null);
-//        } else {
-//            photoFilePath = mPhotoFile.getPath();
-//            Bitmap bitmap = PictureUtils.getScaledBitmap(
-//                    mPhotoFile.getPath(), getActivity());
-//            mPhotoView.setImageBitmap(bitmap);
-//        }
-
         for(File file : CrimeLab.get(getActivity()).getPhotoFiles(mCrime)) {
             if(file.exists()) {
                 Bitmap bitmap = PictureUtils.getScaledBitmap(file.getPath(), getActivity());
-                //mPhotoView.setImageBitmap(bitmap);
 
 				detector = new FaceDetector.Builder(getActivity())
 						.setTrackingEnabled(false)
@@ -340,7 +320,6 @@ public class CrimeFragment extends Fragment {
 				if(yesDetect) {
 					updateImage(bitmap,detector,mPhotoView, true);
 				} else {
-					//holder.image.setContent(bitmap,new SparseArray<Face>(),false);
 					updateImage(bitmap,detector,mPhotoView, false);
 				}
 
@@ -348,13 +327,11 @@ public class CrimeFragment extends Fragment {
                 return;
             }
         }
-        //mPhotoView.setImageDrawable(null);
-
     }
 
 	private void updateImage(Bitmap bitmap, FaceDetector detector, FaceView faceView, boolean yesFd) {
 		Detector<Face> safeDetector = new SafeFaceDetector(detector);
-// Create a frame from the bitmap and run face detection on the frame.
+		// Create a frame from the bitmap and run face detection on the frame.
 		Frame frame = new Frame.Builder().setBitmap(bitmap).build();
 		SparseArray<Face> faces = safeDetector.detect(frame);
 

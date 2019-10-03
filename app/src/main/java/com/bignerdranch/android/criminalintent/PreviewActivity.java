@@ -1,6 +1,5 @@
 package com.bignerdranch.android.criminalintent;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -10,7 +9,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.SparseArray;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bignerdranch.android.criminalintent.face.patch.SafeFaceDetector;
@@ -24,16 +22,12 @@ import java.io.File;
 
 public class PreviewActivity extends AppCompatActivity {
 
-    private ImageView imgDisplay;
     private FaceDetector detector;
-    private Bitmap editedBitmap;
-    private boolean yesFaceDetect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preview);
-//        imgDisplay = (ImageView) findViewById(R.id.imgDisplay);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             boolean isFaceDetect = extras.getBoolean("yesFD");
@@ -47,7 +41,6 @@ public class PreviewActivity extends AppCompatActivity {
             Log.d(getClass().getName(), photoFilePath);
             File imgFile = new File(photoFilePath);
             Bitmap imgBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-//                imgDisplay.setImageBitmap(imgBitmap);
 
             detector = new FaceDetector.Builder(getApplicationContext())
                     .setTrackingEnabled(false)

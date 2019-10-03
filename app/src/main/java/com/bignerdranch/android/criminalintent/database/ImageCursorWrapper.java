@@ -2,7 +2,6 @@ package com.bignerdranch.android.criminalintent.database;
 
 import android.database.Cursor;
 import android.database.CursorWrapper;
-import android.graphics.Bitmap;
 
 public class ImageCursorWrapper extends CursorWrapper {
 	public ImageCursorWrapper(Cursor cursor) {

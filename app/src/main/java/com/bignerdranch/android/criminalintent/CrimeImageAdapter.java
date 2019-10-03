@@ -1,7 +1,6 @@
 package com.bignerdranch.android.criminalintent;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.util.SparseArray;
@@ -9,10 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.TextView;
 
 import com.bignerdranch.android.criminalintent.face.patch.SafeFaceDetector;
 import com.bignerdranch.android.criminalintent.face.photo.FaceView;
@@ -24,7 +19,6 @@ import com.google.android.gms.vision.face.FaceDetector;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.Inflater;
 
 public class CrimeImageAdapter extends ArrayAdapter<File> {
 
@@ -82,21 +76,19 @@ public class CrimeImageAdapter extends ArrayAdapter<File> {
 		if(fd) {
 			updateImage(bitmap,detector,holder.image, true);
 		} else {
-			//holder.image.setContent(bitmap,new SparseArray<Face>(),false);
 			updateImage(bitmap,detector,holder.image, false);
 		}
 		return view;
 	}
 
 	public static class ViewHolder {
-//		ImageView image;
 		File file;
 		FaceView image;
 	}
 
 	private void updateImage(Bitmap bitmap, FaceDetector detector, FaceView faceView, boolean yesFd) {
 		Detector<Face> safeDetector = new SafeFaceDetector(detector);
-// Create a frame from the bitmap and run face detection on the frame.
+		// Create a frame from the bitmap and run face detection on the frame.
 		Frame frame = new Frame.Builder().setBitmap(bitmap).build();
 		SparseArray<Face> faces = safeDetector.detect(frame);
 
