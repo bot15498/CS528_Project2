@@ -1,6 +1,7 @@
 package com.bignerdranch.android.criminalintent;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,11 +58,12 @@ public class CrimeImageAdapter extends ArrayAdapter<File> {
 			view = inflater.inflate(R.layout.crime_image, viewGroup, false); // inflate the layout
 			holder = new ViewHolder();
 			holder.image = (ImageView) view.findViewById(R.id.crimeimage); // get the reference of ImageView
-			view.setTag(holder);
 		} else {
 			holder = (ViewHolder) view.getTag();
 		}
 		File file = mImageFiles.get(i);
+		holder.file = file;
+		view.setTag(holder);
 		Bitmap bitmap = PictureUtils.getScaledBitmap(file.getPath(), holder.image.getMaxWidth(), holder.image.getMaxHeight());
         holder.image.setImageBitmap(bitmap);
 
@@ -70,7 +72,9 @@ public class CrimeImageAdapter extends ArrayAdapter<File> {
 
 	}
 
-	static class ViewHolder {
+
+	public static class ViewHolder {
 		ImageView image;
+		File file;
 	}
 }
