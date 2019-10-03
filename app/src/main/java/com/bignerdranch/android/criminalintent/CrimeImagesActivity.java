@@ -47,6 +47,7 @@ public class CrimeImagesActivity extends AppCompatActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		detector.release();
+		if(detector != null)
+			detector.release();
 	}
 }

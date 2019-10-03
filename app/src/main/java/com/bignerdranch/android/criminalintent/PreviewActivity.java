@@ -106,7 +106,8 @@ public class PreviewActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        detector.release();
+        if(detector != null)
+            detector.release();
     }
 
     Bitmap rotateBitmap(Bitmap bitmapToRotate) {

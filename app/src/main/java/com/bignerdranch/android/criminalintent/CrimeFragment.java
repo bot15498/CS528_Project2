@@ -1,5 +1,6 @@
 package com.bignerdranch.android.criminalintent;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -13,8 +14,10 @@ import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
@@ -82,6 +85,14 @@ public class CrimeFragment extends Fragment {
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
         tempPhotoLocation = null;
         mPhotoFile = CrimeLab.get(getActivity()).getPhotoFile(mCrime);
+
+		if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
+				!= PackageManager.PERMISSION_GRANTED) {
+			// Permission is not granted
+			ActivityCompat.requestPermissions(getActivity(),
+					new String[]{Manifest.permission.CAMERA},
+					100);
+		}
     }
 
 	@Override
@@ -371,7 +382,8 @@ public class CrimeFragment extends Fragment {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		detector.release();
+		if(detector != null)
+			detector.release();
 	}
 
 	Bitmap rotateBitmap(Bitmap bitmapToRotate) {
