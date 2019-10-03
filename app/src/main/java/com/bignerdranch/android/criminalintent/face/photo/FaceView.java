@@ -35,6 +35,7 @@ import com.google.android.gms.vision.face.Landmark;
 public class FaceView extends View {
     private Bitmap mBitmap;
     private SparseArray<Face> mFaces;
+    boolean mLandmarks;
 
     private Paint mBoxPaint;
 
@@ -50,9 +51,10 @@ public class FaceView extends View {
     /**
      * Sets the bitmap background and the associated face detections.
      */
-    public void setContent(Bitmap bitmap, SparseArray<Face> faces) {
+    public void setContent(Bitmap bitmap, SparseArray<Face> faces, boolean landmarks) {
         mBitmap = bitmap;
         mFaces = faces;
+        mLandmarks = landmarks;
         invalidate();
     }
 
@@ -66,7 +68,7 @@ public class FaceView extends View {
         super.onDraw(canvas);
         if ((mBitmap != null) && (mFaces != null)) {
             double scale = drawBitmap(canvas);
-            drawFaceAnnotations(canvas, scale);
+            drawFaceAnnotations(canvas, scale, mLandmarks);
         }
     }
 
@@ -94,7 +96,7 @@ public class FaceView extends View {
      * positions, which tends to place the eye landmarks at the lower eyelid rather than at the
      * pupil position.
      */
-    private void drawFaceAnnotations(Canvas canvas, double scale) {
+    private void drawFaceAnnotations(Canvas canvas, double scale, boolean yesLandmarks) {
         Paint paint = new Paint();
         paint.setColor(Color.GREEN);
         paint.setStyle(Paint.Style.STROKE);
@@ -115,10 +117,12 @@ public class FaceView extends View {
             float bottom = y + yOffset;
             canvas.drawRect(left, top, right, bottom, mBoxPaint);
 
-            for (Landmark landmark : face.getLandmarks()) {
-                int cx = (int) (landmark.getPosition().x * scale);
-                int cy = (int) (landmark.getPosition().y * scale);
-                canvas.drawCircle(cx, cy, 10, paint);
+            if(yesLandmarks) {
+                for (Landmark landmark : face.getLandmarks()) {
+                    int cx = (int) (landmark.getPosition().x * scale);
+                    int cy = (int) (landmark.getPosition().y * scale);
+                    canvas.drawCircle(cx, cy, 10, paint);
+                }
             }
         }
     }

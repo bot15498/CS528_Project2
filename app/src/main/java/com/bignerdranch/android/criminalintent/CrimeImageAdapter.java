@@ -80,9 +80,10 @@ public class CrimeImageAdapter extends ArrayAdapter<File> {
 		Bitmap bitmap = PictureUtils.getScaledBitmap(file.getPath(), Integer.MAX_VALUE, Integer.MAX_VALUE);
 
 		if(fd) {
-			updateImage(bitmap,detector,holder.image);
+			updateImage(bitmap,detector,holder.image, true);
 		} else {
-			holder.image.setContent(bitmap,new SparseArray<Face>());
+			//holder.image.setContent(bitmap,new SparseArray<Face>(),false);
+			updateImage(bitmap,detector,holder.image, false);
 		}
 		return view;
 	}
@@ -93,7 +94,7 @@ public class CrimeImageAdapter extends ArrayAdapter<File> {
 		FaceView image;
 	}
 
-	private void updateImage(Bitmap bitmap, FaceDetector detector, FaceView faceView) {
+	private void updateImage(Bitmap bitmap, FaceDetector detector, FaceView faceView, boolean yesFd) {
 		Detector<Face> safeDetector = new SafeFaceDetector(detector);
 // Create a frame from the bitmap and run face detection on the frame.
 		Frame frame = new Frame.Builder().setBitmap(bitmap).build();
@@ -121,7 +122,12 @@ public class CrimeImageAdapter extends ArrayAdapter<File> {
 			frame = new Frame.Builder().setBitmap(bitmap).build();
 			faces = safeDetector.detect(frame);
 		}
-		faceView.setContent(bitmap,faces);
+
+		if(yesFd) {
+			faceView.setContent(bitmap,faces,false);
+		} else {
+			faceView.setContent(bitmap,new SparseArray<Face>(),false);
+		}
 	}
 
 	Bitmap rotateBitmap(Bitmap bitmapToRotate) {

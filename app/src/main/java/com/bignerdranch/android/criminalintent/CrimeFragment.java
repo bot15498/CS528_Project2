@@ -1,11 +1,14 @@
 package com.bignerdranch.android.criminalintent;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -14,10 +17,12 @@ import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +34,13 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+
+import com.bignerdranch.android.criminalintent.face.patch.SafeFaceDetector;
+import com.bignerdranch.android.criminalintent.face.photo.FaceView;
+import com.google.android.gms.vision.Detector;
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.face.Face;
+import com.google.android.gms.vision.face.FaceDetector;
 
 import java.io.File;
 import java.util.Date;
@@ -52,10 +64,13 @@ public class CrimeFragment extends Fragment {
     private Button mReportButton;
     private Button mSuspectButton;
     private ImageButton mPhotoButton;
-    private ImageView mPhotoView;
+    private FaceView mPhotoView;
     private Button mGalaryButton;
     private CheckBox mFaceDetectCheckbox;
     private boolean yesDetect;
+    private FaceView imgFace;
+    private View v1;
+	private FaceDetector detector;
 
     private String photoFilePath;
 
@@ -89,6 +104,8 @@ public class CrimeFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_crime, container, false);
+		v1 = v;
+
 
 		mTitleField = (EditText) v.findViewById(R.id.crime_title);
 		mTitleField.setText(mCrime.getTitle());
@@ -137,6 +154,7 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 yesDetect = isChecked;
+                updatePhotoView();
             }
         });
 
@@ -206,19 +224,21 @@ public class CrimeFragment extends Fragment {
             }
         });
 
-        mPhotoView = (ImageView) v.findViewById(R.id.crime_photo);
-        mPhotoView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            	Log.d("blah",photoFilePath);
-                if (photoFilePath != null) {
-                    Intent intent = new Intent(getActivity(), PreviewActivity.class);
-                    intent.putExtra("photoFilePath", photoFilePath);
-                    intent.putExtra("yesFD", yesDetect);
-                    startActivity(intent);
-                }
-            }
-        });
+        mPhotoView = (FaceView) v.findViewById(R.id.crime_photo);
+		mPhotoView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				if(photoFilePath != null) {
+					Log.d("blah", photoFilePath);
+					if (photoFilePath != null) {
+						Intent intent = new Intent(getActivity(), PreviewActivity.class);
+						intent.putExtra("photoFilePath", photoFilePath);
+						intent.putExtra("yesFD", yesDetect);
+						startActivity(intent);
+					}
+				}
+			}
+		});
 
         updatePhotoView();
 
@@ -310,14 +330,71 @@ public class CrimeFragment extends Fragment {
         for(File file : CrimeLab.get(getActivity()).getPhotoFiles(mCrime)) {
             if(file.exists()) {
                 Bitmap bitmap = PictureUtils.getScaledBitmap(file.getPath(), getActivity());
-                mPhotoView.setImageBitmap(bitmap);
+                //mPhotoView.setImageBitmap(bitmap);
+
+				detector = new FaceDetector.Builder(getActivity())
+						.setTrackingEnabled(false)
+						.setLandmarkType(FaceDetector.ALL_LANDMARKS)
+						.build();
+
+				if(yesDetect) {
+					updateImage(bitmap,detector,mPhotoView, true);
+				} else {
+					//holder.image.setContent(bitmap,new SparseArray<Face>(),false);
+					updateImage(bitmap,detector,mPhotoView, false);
+				}
+
                 photoFilePath = file.getPath();
                 return;
             }
         }
-        mPhotoView.setImageDrawable(null);
+        //mPhotoView.setImageDrawable(null);
 
     }
+
+	private void updateImage(Bitmap bitmap, FaceDetector detector, FaceView faceView, boolean yesFd) {
+		Detector<Face> safeDetector = new SafeFaceDetector(detector);
+// Create a frame from the bitmap and run face detection on the frame.
+		Frame frame = new Frame.Builder().setBitmap(bitmap).build();
+		SparseArray<Face> faces = safeDetector.detect(frame);
+
+		int rotations = 0;
+		int numFaces;
+		int max = 0;
+		int maxRotations = 0;
+		while (rotations < 3) {
+			Bitmap tmpImgBitmap = rotateBitmap(bitmap);
+			frame = new Frame.Builder().setBitmap(tmpImgBitmap).build();
+			faces = safeDetector.detect(frame);
+			numFaces = faces.size();
+			if (max <= numFaces) {
+				max = numFaces;
+				maxRotations = rotations;
+			}
+			rotations++;
+		}
+
+		for (int i=0; i<=maxRotations; i++)
+		{
+			bitmap = rotateBitmap(bitmap);
+			frame = new Frame.Builder().setBitmap(bitmap).build();
+			faces = safeDetector.detect(frame);
+		}
+
+		if(yesFd) {
+			faceView.setContent(bitmap,faces,false);
+		} else {
+			faceView.setContent(bitmap,new SparseArray<Face>(),false);
+		}
+	}
+
+	Bitmap rotateBitmap(Bitmap bitmapToRotate) {
+		Matrix matrix = new Matrix();
+		matrix.postRotate(90);
+		return Bitmap.createBitmap(bitmapToRotate, 0, 0,
+				bitmapToRotate.getWidth(), bitmapToRotate.getHeight(), matrix,
+				true);
+	}
 
 	public File getGeneratedPhotoLocation() {
 		File externalFilesDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);

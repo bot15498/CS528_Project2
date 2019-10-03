@@ -99,10 +99,10 @@ public class PreviewActivity extends AppCompatActivity {
             FaceView overlay = (FaceView) findViewById(R.id.faceView);
 
             if (yesFaceDet) {
-                overlay.setContent(imgBitmap, faces);
+                overlay.setContent(imgBitmap, faces,true);
                 Toast.makeText(getApplicationContext(), "Detected " + faces.size() +  " total", Toast.LENGTH_LONG).show();
             } else {
-                overlay.setContent(imgBitmap, new SparseArray<Face>());
+                overlay.setContent(imgBitmap, new SparseArray<Face>(),true);
             }
             safeDetector.release();
         }
