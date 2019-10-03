@@ -56,6 +56,8 @@ public class FaceView extends View {
         invalidate();
     }
 
+
+
     /**
      * Draws the bitmap background and the associated face landmarks.
      */
@@ -119,5 +121,9 @@ public class FaceView extends View {
                 canvas.drawCircle(cx, cy, 10, paint);
             }
         }
+    }
+
+    public Bitmap getmBitmap() {
+        return mBitmap;
     }
 }

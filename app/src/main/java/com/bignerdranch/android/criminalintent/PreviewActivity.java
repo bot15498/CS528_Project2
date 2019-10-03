@@ -1,5 +1,6 @@
 package com.bignerdranch.android.criminalintent;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -120,5 +121,4 @@ public class PreviewActivity extends AppCompatActivity {
                 bitmapToRotate.getWidth(), bitmapToRotate.getHeight(), matrix,
                 true);
     }
-
 }
