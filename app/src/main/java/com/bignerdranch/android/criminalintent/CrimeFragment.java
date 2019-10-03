@@ -73,7 +73,7 @@ public class CrimeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
-        tempPhotoLocation = null
+        tempPhotoLocation = null;
         mPhotoFile = CrimeLab.get(getActivity()).getPhotoFile(mCrime);
     }
 
@@ -209,6 +209,7 @@ public class CrimeFragment extends Fragment {
         mPhotoView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+            	Log.d("blah",photoFilePath);
                 if (photoFilePath != null) {
                     Intent intent = new Intent(getActivity(), PreviewActivity.class);
                     intent.putExtra("photoFilePath", photoFilePath);
@@ -296,30 +297,32 @@ public class CrimeFragment extends Fragment {
 	}
 
     private void updatePhotoView() {
-        if (mPhotoFile == null || !mPhotoFile.exists()) {
-            mPhotoView.setImageDrawable(null);
-        } else {
-            photoFilePath = mPhotoFile.getPath();
-            Bitmap bitmap = PictureUtils.getScaledBitmap(
-                    mPhotoFile.getPath(), getActivity());
-            mPhotoView.setImageBitmap(bitmap);
-        }
+//        if (mPhotoFile == null || !mPhotoFile.exists()) {
+//            mPhotoView.setImageDrawable(null);
+//        } else {
+//            photoFilePath = mPhotoFile.getPath();
+//            Bitmap bitmap = PictureUtils.getScaledBitmap(
+//                    mPhotoFile.getPath(), getActivity());
+//            mPhotoView.setImageBitmap(bitmap);
+//        }
 
         for(File file : CrimeLab.get(getActivity()).getPhotoFiles(mCrime)) {
             if(file.exists()) {
                 Bitmap bitmap = PictureUtils.getScaledBitmap(file.getPath(), getActivity());
                 mPhotoView.setImageBitmap(bitmap);
+                photoFilePath = file.getPath();
                 return;
             }
         }
         mPhotoView.setImageDrawable(null);
 
-        public File getGeneratedPhotoLocation() {
-            File externalFilesDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-            if (externalFilesDir == null) {
-                return null;
-            }
-            return new File(externalFilesDir, "IMG_" + System.currentTimeMillis() + ".jpg");
-        }
     }
+
+	public File getGeneratedPhotoLocation() {
+		File externalFilesDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+		if (externalFilesDir == null) {
+			return null;
+		}
+		return new File(externalFilesDir, "IMG_" + System.currentTimeMillis() + ".jpg");
+	}
 }

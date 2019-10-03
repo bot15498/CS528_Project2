@@ -79,6 +79,17 @@ public class CrimeLab {
 		}
 	}
 
+	public File getPhotoFile(Crime crime) {
+		File externalFilesDir = mContext
+				.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
+		if (externalFilesDir == null) {
+			return null;
+		}
+
+		return new File(externalFilesDir, crime.getPhotoFilename());
+	}
+
 	public ArrayList<File> getPhotoFiles(Crime crime) {
 		ArrayList<File> photoFiles = new ArrayList<>();
 		ImageCursorWrapper cursor = queryCrimeImages(
