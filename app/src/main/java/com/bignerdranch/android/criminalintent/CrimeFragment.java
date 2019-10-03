@@ -159,6 +159,7 @@ public class CrimeFragment extends Fragment {
 			public void onClick(View v) {
 				Intent intent = new Intent(getActivity(), CrimeImagesActivity.class);
 				intent.putExtra("CRIME_UUID", mCrime.getId());
+				intent.putExtra("yesFD", yesDetect);
 				startActivity(intent);
 			}
 		});
