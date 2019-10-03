@@ -52,13 +52,15 @@ public class PreviewActivity extends AppCompatActivity {
             // Create a frame from the bitmap and run face detection on the frame.
             Frame frame = new Frame.Builder().setBitmap(imgBitmap).build();
             SparseArray<Face> faces = safeDetector.detect(frame);
+            Bitmap tmpImgBitmap = imgBitmap;
 
             int rotations = 0;
             int numFaces;
             int max = 0;
             int maxRotations = 0;
-            while (rotations < 1) {
-                Bitmap tmpImgBitmap = rotateBitmap(imgBitmap);
+            while (rotations < 3) {
+                rotations++;
+                tmpImgBitmap = rotateBitmap(tmpImgBitmap);
                 frame = new Frame.Builder().setBitmap(tmpImgBitmap).build();
                 faces = safeDetector.detect(frame);
                 numFaces = faces.size();
@@ -66,10 +68,9 @@ public class PreviewActivity extends AppCompatActivity {
                     max = numFaces;
                     maxRotations = rotations;
                 }
-                rotations++;
             }
 
-            for (int i=0; i<=maxRotations; i++)
+            for (int i=0; i<maxRotations; i++)
             {
                 imgBitmap = rotateBitmap(imgBitmap);
                 frame = new Frame.Builder().setBitmap(imgBitmap).build();
