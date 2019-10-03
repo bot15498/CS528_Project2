@@ -339,7 +339,7 @@ public class CrimeFragment extends Fragment {
 		int numFaces;
 		int max = 0;
 		int maxRotations = 0;
-		while (rotations < 3) {
+		while (rotations < 1) {
 			Bitmap tmpImgBitmap = rotateBitmap(bitmap);
 			frame = new Frame.Builder().setBitmap(tmpImgBitmap).build();
 			faces = safeDetector.detect(frame);
@@ -363,6 +363,13 @@ public class CrimeFragment extends Fragment {
 		} else {
 			faceView.setContent(bitmap,new SparseArray<Face>(),false);
 		}
+		safeDetector.release();
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		detector.release();
 	}
 
 	Bitmap rotateBitmap(Bitmap bitmapToRotate) {
